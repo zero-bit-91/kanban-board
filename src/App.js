@@ -40,7 +40,6 @@ const columns = [
 ];
 
 export default function App() {
-  // Set body background only once
   useEffect(() => {
     document.body.style.background =
       'url("https://images.unsplash.com/photo-1513519245088-0e12902e5a38?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") center/cover no-repeat fixed';
@@ -65,6 +64,22 @@ export default function App() {
     note: "",
     link: ""
   });
+
+  // Delete function
+  const deleteTask = (colKey, taskId) => {
+    setTasks((prev) => ({
+      ...prev,
+      [colKey]: prev[colKey].filter((task) => task.id !== taskId)
+    }));
+    // Exit edit mode if the deleted task was being edited
+    if (
+      editingTask.col === colKey &&
+      tasks[colKey][editingTask.idx] &&
+      tasks[colKey][editingTask.idx].id === taskId
+    ) {
+      setEditingTask({ col: null, idx: null });
+    }
+  };
 
   // Drag and drop handler
   const onDragEnd = (result) => {
@@ -160,7 +175,8 @@ export default function App() {
     borderRadius: 10,
     boxShadow: "0 2px 12px 0 rgba(33,150,243,0.08)",
     transition: "box-shadow 0.2s",
-    cursor: "pointer"
+    cursor: "pointer",
+    position: "relative"
   };
   const cardActiveStyle = {
     ...cardStyle,
@@ -173,22 +189,21 @@ export default function App() {
       {showConfetti && <Confetti />}
       <div style={{ padding: 28 }}>
         <h1
-  style={{
-    fontWeight: 700,
-    fontSize: 36,
-    marginBottom: 24,
-    color: "#333",
-    textShadow: "0 1px 4px #fff9",
-    background: "#fff",
-    padding: "10px 24px",
-    borderRadius: "12px",
-    display: "inline-block",
-    boxShadow: "0 2px 8px 0 rgba(33,150,243,0.09)"
-  }}
->
-  Kanban Board
-</h1>
-
+          style={{
+            fontWeight: 700,
+            fontSize: 36,
+            marginBottom: 24,
+            color: "#333",
+            textShadow: "0 1px 4px #fff9",
+            background: "#fff",
+            padding: "10px 24px",
+            borderRadius: "12px",
+            display: "inline-block",
+            boxShadow: "0 2px 8px 0 rgba(33,150,243,0.09)"
+          }}
+        >
+          Kanban Board
+        </h1>
         <form
           onSubmit={addTask}
           style={{
@@ -332,6 +347,26 @@ export default function App() {
                             }
                             onClick={() => handleTaskClick(col.key, idx, task)}
                           >
+                            {/* DELETE BUTTON */}
+                            <button
+                              onClick={e => {
+                                e.stopPropagation();
+                                deleteTask(col.key, task.id);
+                              }}
+                              style={{
+                                position: "absolute",
+                                top: 6,
+                                right: 10,
+                                border: "none",
+                                background: "none",
+                                color: "#d32f2f",
+                                fontSize: 18,
+                                cursor: "pointer"
+                              }}
+                              title="Delete Task"
+                            >
+                              🗑️
+                            </button>
                             <div style={{ fontWeight: "bold", fontSize: 16, marginBottom: 2 }}>
                               {task.text}
                             </div>
