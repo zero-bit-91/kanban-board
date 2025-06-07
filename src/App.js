@@ -3,113 +3,14 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import Confetti from "react-confetti";
 
 const QUOTES = [
-  "Success is the sum of small efforts, repeated day in and day out.",
-  "Your only limit is your mind.",
-  "Push yourself, because no one else is going to do it for you.",
-  "Don’t watch the clock; do what it does. Keep going.",
-  "Dream it. Wish it. Do it.",
-  "It always seems impossible until it’s done.",
-  "The secret of getting ahead is getting started.",
-  "Little by little, one travels far.",
-  "If you can dream it, you can do it.",
-  "The only way to achieve the impossible is to believe it is possible.",
-  "Great things never come from comfort zones.",
-  "Don't stop until you're proud.",
-  "Doubt kills more dreams than failure ever will.",
-  "It does not matter how slowly you go, as long as you do not stop.",
-  "Perseverance is not a long race; it is many short races one after the other.",
-  "The future depends on what you do today.",
-  "Difficult roads often lead to beautiful destinations.",
-  "Small steps in the right direction can turn out to be the biggest step of your life.",
-  "Success doesn’t just find you. You have to go out and get it.",
-  "Wake up with determination. Go to bed with satisfaction.",
-  "Hard work beats talent when talent doesn't work hard.",
-  "Don’t wish it were easier. Wish you were better.",
-  "Action is the foundational key to all success.",
-  "Never give up on a dream just because of the time it will take to accomplish it. The time will pass anyway.",
-  "You don’t have to be great to start, but you have to start to be great.",
-  "The best way to predict your future is to create it.",
-  "Opportunities don’t happen. You create them.",
-  "Sometimes later becomes never. Do it now.",
-  "You are capable of amazing things.",
-  "Difficulties in life are intended to make us better, not bitter.",
-  "A river cuts through rock, not because of its power, but because of its persistence.",
-  "Don't watch the clock; do what it does. Keep going.",
-  "Quality is not an act, it is a habit.",
-  "Believe you can and you're halfway there.",
-  "Be stronger than your excuses.",
-  "You only fail when you stop trying.",
-  "Great things take time. Be patient.",
-  "The difference between ordinary and extraordinary is that little extra.",
-  "Act as if what you do makes a difference. It does.",
-  "The only limit to our realization of tomorrow will be our doubts of today.",
-  "The only way to do great work is to love what you do.",
-  "Push yourself, because no one else is going to do it for you.",
-  "Your life does not get better by chance, it gets better by change.",
-  "Work hard in silence, let success make the noise.",
-  "Don’t let yesterday take up too much of today.",
-  "Success is not final, failure is not fatal: It is the courage to continue that counts.",
-  "Failure will never overtake me if my determination to succeed is strong enough.",
-  "Set your goals high, and don't stop till you get there.",
-  "The journey of a thousand miles begins with one step.",
-  "Believe in yourself and all that you are.",
-  "If opportunity doesn’t knock, build a door.",
-  "It’s not whether you get knocked down, it’s whether you get up.",
-  "The harder you work for something, the greater you’ll feel when you achieve it.",
-  "Don’t limit your challenges. Challenge your limits.",
-  "Doubt whom you will, but never yourself.",
-  "Success is not in what you have, but who you are.",
-  "Big journeys begin with small steps.",
-  "Start where you are. Use what you have. Do what you can.",
-  "You miss 100% of the shots you don’t take.",
-  "Don’t count the days, make the days count.",
-  "Your only limit is you.",
-  "Go the extra mile. It’s never crowded.",
-  "Never let the fear of striking out keep you from playing the game.",
-  "Never regret anything that made you smile.",
-  "Nothing will work unless you do.",
-  "Difficult roads often lead to beautiful destinations.",
-  "Sometimes we’re tested not to show our weaknesses, but to discover our strengths.",
-  "Great things never came from comfort zones.",
-  "Little things make big days.",
-  "The best way to get started is to quit talking and begin doing.",
-  "The difference between who you are and who you want to be is what you do.",
-  "Success doesn’t come from what you do occasionally, it comes from what you do consistently.",
-  "You are braver than you believe, stronger than you seem, and smarter than you think.",
-  "Dream bigger. Do bigger.",
-  "The struggle you’re in today is developing the strength you need for tomorrow.",
-  "What you get by achieving your goals is not as important as what you become by achieving your goals.",
-  "Motivation is what gets you started. Habit is what keeps you going.",
-  "No masterpiece was ever created by a lazy artist.",
-  "Do something today that your future self will thank you for.",
-  "Don’t wish for it. Work for it.",
-  "Discipline is doing what needs to be done, even if you don’t want to do it.",
-  "If you’re going through hell, keep going.",
-  "You don’t have to be perfect to be amazing.",
-  "The pain you feel today will be the strength you feel tomorrow.",
-  "A little progress each day adds up to big results.",
-  "Never stop doing your best just because someone doesn’t give you credit.",
-  "Focus on your goal. Don’t look in any direction but ahead.",
-  "Doubt kills more dreams than failure ever will.",
-  "Don’t tell people your plans. Show them your results.",
-  "The key to success is to focus our conscious mind on things we desire, not things we fear.",
-  "Success is what happens after you have survived all your mistakes.",
-  "You don’t need to see the whole staircase, just take the first step.",
-  "Great things are done by a series of small things brought together.",
-  "It always seems impossible until it’s done.",
-  "If you want to achieve greatness stop asking for permission.",
-  "Start each day with a positive thought and a grateful heart.",
-  "The best time to plant a tree was 20 years ago. The second best time is now.",
-  "You are the artist of your own life. Don’t hand the paintbrush to anyone else.",
-  "If you don’t sacrifice for what you want, what you want becomes the sacrifice.",
-  "Opportunities are usually disguised as hard work, so most people don’t recognize them.",
-  "Don’t be afraid to give up the good to go for the great.",
-  "Nothing is impossible. The word itself says 'I’m possible!'"
+  // ... (keep your 100 quotes here, truncated for clarity)
 ];
 
 const QUOTE_KEY = "kanban-motivation-quote";
 const QUOTE_TIME_KEY = "kanban-motivation-quote-time";
 const QUOTE_ROTATE_MS = 21 * 60 * 60 * 1000;
+
+const TASKS_KEY = "kanban-board-tasks"; // localStorage key for tasks
 
 const initialData = {
   todo: [
@@ -177,7 +78,28 @@ export default function App() {
     }
   }, []);
 
-  const [tasks, setTasks] = useState(initialData);
+  // ------------------- LOCAL STORAGE LOGIC FOR TASKS -------------------
+  // Try to load tasks from localStorage, fallback to initialData
+  const getSavedTasks = () => {
+    const saved = localStorage.getItem(TASKS_KEY);
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return initialData;
+      }
+    }
+    return initialData;
+  };
+
+  const [tasks, setTasks] = useState(getSavedTasks());
+
+  // Save tasks to localStorage every time tasks change
+  useEffect(() => {
+    localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+  }, [tasks]);
+  // ---------------------------------------------------------------------
+
   const [showConfetti, setShowConfetti] = useState(false);
 
   const [newTask, setNewTask] = useState("");
